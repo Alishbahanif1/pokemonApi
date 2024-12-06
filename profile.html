@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="stylep.css" rel="stylesheet">
+
+</head>
+<body>
+<!-- Data section -->
+    <div id="content">
+        <h3> <a id="demo" href="index.html">Back</a></h3> 
+        <!-- Image section -->
+         <h1 id="t">The </h1>
+        <div id="img"></div>
+       <!-- end Image section -->
+        <!-- Data section -->
+        <div id="data">
+            
+            <p id="name"><b>Name: </b></p>
+            <p id="weight"><b>Weight: </b></p>
+            <p id="abilities"><b>Abilities: </b></p>
+            <p id="height"><b>Height: </b></p>
+            <p id="moves"><b>Moves: </b></p>
+        </div>
+        <!-- end Data section -->
+    </div>
+<!-- Data section end -->
+    <script>
+        //getting pokemon api from url
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('api'); // Get Pokémon ID from URL
+//fetching image and data from api for specific character
+        fetch('https://pokeapi.co/api/v2/pokemon/' + id)
+            .then((response) => response.json())
+            .then((data) => {
+               
+
+                // Set the image
+                let imageUrl = data.sprites.front_default;
+                document.getElementById('img').innerHTML = `
+                    <img src="${imageUrl}" alt="${data.name}">
+                `;
+
+                // Set the name, weight, height, 
+                document.getElementById('t').innerHTML += `${data.forms[0].name}`;
+                document.getElementById('name').innerHTML += `${data.forms[0].name}`;
+                document.getElementById('weight').innerHTML += `${data.weight}`;
+                document.getElementById('height').innerHTML += `${data.height}`;
+                //Displaying abilities
+                let abilitiesList = '';
+                for (let i = 0; i < data.abilities.length; i++) {
+                    console.log( data.abilities[i].ability.name);
+                    abilitiesList += data.abilities[i].ability.name;
+                    if (i < data.abilities.length - 1) {
+                        abilitiesList += ', ';
+                    }}
+                    document.getElementById('abilities').innerHTML += `${abilitiesList}`;
+
+
+                //will display only upto 7 moves
+                let maxMoves = 7;
+                let movesList = '';
+                for (let i = 0; i < maxMoves && i < data.moves.length; i++) {
+                    movesList += data.moves[i].move.name;
+                    //for the sake of putting commas between moves
+                    if (i < maxMoves - 1 && i < data.moves.length - 1) {
+                    movesList += ', ';
+                  }
+                }document.getElementById('moves').innerHTML += `${movesList}`;
+            })
+            //error handling
+            .catch((error) => {
+                console.error('Error fetching Pokémon data:', error);
+            });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.8">
+    <link href="style.css" rel="stylesheet"> 
+    <title>Utilizing Advance Concept</title>
+</head>
+<div>
+<h1>The Pokémon's</h1>
+    <div id="mylist"></div>
+    <span id="c"></span>
+    <div class="button-container">
+    <button id="previous" onclick="fetchPokemonData(previous)" disabled>&lt;&lt; Previous</button>
+    <button id="next" onclick="fetchPokemonData(next)" disabled>Next &gt;&gt;</button>
+</div>
+    <script>
+        let next = "";
+        let previous = "";
+        let currentData = ""; // Store the current data for pagination
+//function for fetchingdata from api
+        function fetchPokemonData(url) {
+            fetch(url)
+                .then((response) => response.json())
+                .then((data) => {
+                    currentData = data;  // Save the current data for pagination
+
+                    // Set pagination links
+                    next = data.next;
+                    previous = data.previous;
+
+                    // Set the total Pokémon count
+                    document.getElementById('c').innerHTML = `Total Pokémon: ${data.count}`;
+
+                    // Enable/Disable the buttons based on next/previous availability
+                    document.getElementById('next').disabled = !next;
+                    document.getElementById('previous').disabled = !previous;
+
+                    // Render the list of Pokémon
+                    let result = data.results;
+                    document.getElementById('mylist').innerHTML = ''; // Clear previous list
+
+                    // Using for loop for loop to iterate over result array and create html content for each character
+                    for (let i = 0; i < result.length; i++) {
+                        let pokemon = result[i];
+
+                        // Make a fetch request for each Pokémon to get detailed information
+                        fetch(pokemon.url)
+                            .then((res) => res.json())
+                            .then((pokemonData) => {
+                                let imageUrl = pokemonData.sprites.front_default;
+                                let pokemonName = pokemon.name;
+
+                                // Now append the HTML content for each Pokémon like image and name
+                                document.getElementById('mylist').innerHTML += `
+                                    <div class="product-card">
+                                        <img src="${imageUrl}" alt="${pokemonName}">
+                                        <figcaption>
+                                            <a href="profile.html?api=${pokemonData.id}" style="text-decoration: none; color: #333;">${pokemonName}</a>
+                                        </figcaption>
+                                    </div>
+                                `;
+                            })
+                            //error handling for fetching image
+                            .catch((error) => {
+                                console.error('Error fetching Pokémon image:', error);
+                            });
+                    }
+
+                })
+                //error handling for fetching data
+                .catch((error) => {
+                    console.error('Error fetching Pokémon data:', error);
+                });
+        }
+
+        // Initial fetch to load the first page of Pokémon data
+        fetchPokemonData('https://pokeapi.co/api/v2/pokemon');
+    </script>
+</body>
+</html>
